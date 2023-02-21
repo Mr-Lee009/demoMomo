@@ -1,0 +1,83 @@
+version: "3.3"
+networks:
+  momo-tool:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.170.0.0/24"
+          # gateway: "192.170.0.1"
+
+services:
+  mysql_payment:
+    image: mysql:8.0.28
+    container_name: SQL_PAYMENT
+    restart: unless-stopped
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_ROOT_PASSWORD=group8vnhn
+      - MYSQL_DATABASE=xocinema
+      - MYSQL_USER=ducla
+      - MYSQL_PASSWORD=ducla
+    ports:
+      - "3308:3306"
+    networks:
+      - momo-tool
+
+  mysql_Msi:
+    image: mysql:8.0.28
+    container_name: SQL_PG
+    restart: unless-stopped
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_ROOT_PASSWORD=group8vnhn
+      - MYSQL_DATABASE=xocinema
+      - MYSQL_USER=ducla
+      - MYSQL_PASSWORD=ducla
+    ports:
+      - "3310:3306"
+    networks:
+      - momo-tool
+
+  mysql_Document:
+    image: mysql:8.0.28
+    container_name: SQL_DOCUMENT
+    restart: unless-stopped
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_ROOT_PASSWORD=group8vnhn
+      - MYSQL_DATABASE=xocinema
+      - MYSQL_USER=ducla
+      - MYSQL_PASSWORD=ducla
+    ports:
+      - "3309:3306"
+    networks:
+      - momo-tool
+
+  MOMO-SERVICE:
+    image: momo_container:latest
+    container_name: springboot-momo
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    env_file: ./.env
+    ports:
+      - $SPRING_BOOT_MOMO_PORT:$SPRING_BOOT_DOCKER_PORT
+    volumes:
+      - ./:/app
+    networks:
+      - momo-tool
+
+    # config redis
+
+  cache:
+    image: "redis"
+    container_name: cache-redis
+    ports:
+      - "6379:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+
+
+#docker-compose -f .\docker-compose-Momo.yml up --build
