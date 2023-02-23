@@ -14,7 +14,7 @@ import vn.com.momo.util.CustomDateSerializer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@JsonIgnoreProperties({"requestUser","request","key"})
+@JsonIgnoreProperties({"requestUser", "request", "key"})
 public class DayoffRequest extends BaseEntity<Integer> {
     public Integer Id;
 
@@ -56,44 +56,33 @@ public class DayoffRequest extends BaseEntity<Integer> {
         return _key;
     }
 
-    public class DayoffRequestKey {
-        public DayoffPeriod offType;
-        public RequestStatuts status;
-        public Date offDate;
-
-        public DayoffRequestKey(DayoffPeriod offType, RequestStatuts status, Date offDate) {
-            this.offType = offType;
-            this.status = status;
-            this.offDate = offDate;
-        }
-        public DayoffRequestKey() {
-
-        }
-        @Override
-        public int hashCode() {
-            return this.offDate.hashCode() + this.offDate.hashCode() + this.offType.hashCode();
-        }
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof DayoffRequestKey dayoffRequestKey) {
-                return offType == dayoffRequestKey.offType && offDate == dayoffRequestKey.offDate
-                        && status == dayoffRequestKey.status;
-            }
-            return false;
-        }
-    }
-
     public static void main(String[] args) {
-        List<String> list = Arrays.asList("red", "blue", "blue", "green", "red","blue","red");
-        List<String> otherList = Arrays.asList("red", "green", "green", "yellow","red");
+        String[] A = {"6", "5", "4", "5"};
+        String[] B = {"6", "1", "4", "5"};
+        String[] C = {"16", "13", "14", "15"};
 
-        Set<String> result = list.stream()
-                            .distinct()
-                            .filter(otherList::contains)
-                            .collect(Collectors.toSet());
+        Map<String, List<String>> map = new HashMap<>();
+        map.put("A", Arrays.asList(A));
+        map.put("B", Arrays.asList(B));
+        map.put("C", Arrays.asList(C));
 
-        System.out.println(result);
+        List<String> value =  map.values().stream()
+                .flatMap(l->l.stream())
+                .collect(Collectors.toSet())
+                .stream().toList();
 
+        System.out.println(value);
+
+        List<String> list = Arrays.asList("red", "blue", "blue", "green", "red", "blue", "red");
+//        List<String> otherList = Arrays.asList("red", "green", "green", "yellow", "red");
+//
+//        Set<String> result = list.stream()
+//                .distinct()
+//                .filter(otherList::contains)
+//                .collect(Collectors.toSet());
+//
+//        System.out.println(result);
+        System.out.println(String.join("-",list));
 
     }
 }

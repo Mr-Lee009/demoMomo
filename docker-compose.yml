@@ -7,7 +7,6 @@ networks:
       config:
         - subnet: "192.170.0.0/24"
           # gateway: "192.170.0.1"
-
 services:
   mysql_payment:
     image: mysql:8.0.28
@@ -62,7 +61,7 @@ services:
       dockerfile: Dockerfile
     env_file: ./.env
     ports:
-      - $SPRING_BOOT_MOMO_PORT:$SPRING_BOOT_DOCKER_PORT
+      - "$SPRING_BOOT_MOMO_PORT:$SPRING_BOOT_DOCKER_PORT"
     volumes:
       - ./:/app
     networks:
