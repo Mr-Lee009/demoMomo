@@ -1,4 +1,4 @@
-package vn.com.momo;
+package vn.com.momo.demo;
 
 public class RangeValue<T> {
     public T start;

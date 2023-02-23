@@ -1,4 +1,4 @@
-package vn.com.momo;
+package vn.com.momo.demo;
 
 import java.awt.dnd.InvalidDnDOperationException;
 import java.util.*;
@@ -31,23 +31,21 @@ public class ConsecutiveHeap<TKey, TValue> implements Iterable<RangeValue<TValue
     void add(TValue value) {
         TKey key = _generator.GenerateKey(value);
         Node existingNode = _internal.get(key);
-
         if (null == existingNode && isDuplicate(value, existingNode.data)) {
             throw new InvalidDnDOperationException();
         }
         if (null != existingNode) {
             existingNode.data = value;
-        } else {
+        }
+        else {
             Node currentNode = new Node(key, value);
             _internal.put(key, existingNode);
-
             TKey previousKey = _generator.GeneratePreviousKey(key);
             Node previousNode = null;
             if (null != (previousNode = _internal.get(previousKey))) {
                 currentNode.previous = previousNode;
                 previousNode.next = currentNode;
             }
-
             TKey nextKey = _generator.GenerateNextKey(key);
             Node nextNode = null;
             if (null != (nextNode = _internal.get(previousKey))) {
@@ -57,9 +55,16 @@ public class ConsecutiveHeap<TKey, TValue> implements Iterable<RangeValue<TValue
         }
     }
 
+    private boolean isDuplicate(TValue value, TValue duplicate) {
+        return value.equals(duplicate);
+    }
+
+    /**[ConsecutiveHeapIterator]*/
     private class ConsecutiveHeapIterator implements Iterator<RangeValue<TValue>> {
 
-        private Set<TValue> _set = new HashSet<>();
+        private TKey curentKey = null;
+
+        private Set<TKey> _set = new HashSet<>();
         private Iterator<Map.Entry<TKey, Node>> _internal;
         private RangeValue<TValue> _current;
 
@@ -67,7 +72,24 @@ public class ConsecutiveHeap<TKey, TValue> implements Iterable<RangeValue<TValue
             if (_current != null) {
                 return _current;
             }
-            return null;
+            RangeValue<TValue> dto = new RangeValue<>();
+
+            Node start = ConsecutiveHeap.this._internal.get(curentKey);
+            Node end = start;
+
+            while (start.previous != null) {
+                start = start.previous;
+                _set.add(start.key);
+            }
+            dto.start = start.data;
+
+            while (end.next != null) {
+                end = end.previous;
+                _set.add(end.key);
+            }
+            dto.end = end.data;
+
+            return _current = dto;
         }
 
         public ConsecutiveHeapIterator(Iterator<Map.Entry<TKey, Node>> internal) {
@@ -76,7 +98,7 @@ public class ConsecutiveHeap<TKey, TValue> implements Iterable<RangeValue<TValue
 
         @Override
         public boolean hasNext() {
-            return false;
+            return ConsecutiveHeap.this._internal.containsKey(curentKey);
         }
 
         @Override
@@ -106,11 +128,6 @@ public class ConsecutiveHeap<TKey, TValue> implements Iterable<RangeValue<TValue
             this.data = data;
         }
     }
-
-    private boolean isDuplicate(TValue value, TValue duplicate) {
-        return value.equals(duplicate);
-    }
-
     public interface IKeyGenerator<TKey, TValue> {
         public TKey GenerateKey(TValue value);
 
